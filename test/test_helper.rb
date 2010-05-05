@@ -27,8 +27,7 @@ class Test::Unit::TestCase
 
   # Global Setup
   setup do
-    mock_response = OpenStruct.new(:body => RESPONSES[:detect])
-    Net::HTTP.stubs(:get).returns(mock_response)
+    Net::HTTP.stubs(:get).returns(RESPONSES[:detect])
     Facecom.stubs(:config).returns({
       "api_key" => "abcde",
       "api_secret" => "bcddd"

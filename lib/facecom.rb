@@ -3,8 +3,14 @@ require 'net/http'
 require 'uri'
 require 'ostruct'
 require 'cgi'
+require 'yaml'
+
 require 'facecom/tag'
 
+# You must have a facecom.yml file in the directory you're running from. It
+# should look like this
+#     api_key: abcde
+#     api_secret: sekret
 module Facecom
   BASE_URL = "http://api.face.com/faces"
   
@@ -12,8 +18,8 @@ module Facecom
   def self.detect(url)
     face_url = "#{BASE_URL}/detect.json?api_key=%s&api_secret=%s&urls=%s" %
                [api_key, api_secret, url].map { |i| CGI.escape(i) }
-    raw = Net::HTTP.get(URI.parse(url))
-    json = JSON.parse(raw.body)
+    raw = Net::HTTP.get(URI.parse(face_url))
+    json = JSON.parse(raw)
     json["photos"].map { |p| p["tags"].map { |t| Facecom::Tag.new(t) }}.flatten
   end
 
@@ -22,7 +28,7 @@ module Facecom
   end
 
   def self.config
-    @config ||= File.read(config_file)
+    @config ||= YAML.load_file(config_file)
   end
 
   def self.api_key
