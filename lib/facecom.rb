@@ -20,7 +20,12 @@ module Facecom
                [api_key, api_secret, url].map { |i| CGI.escape(i) }
     raw = Net::HTTP.get(URI.parse(face_url))
     json = JSON.parse(raw)
-    json["photos"].map { |p| p["tags"].map { |t| Facecom::Tag.new(t) }}.flatten
+    tags = json["photos"].map do |p|
+      width  = p["width"]
+      height = p["height"]
+      p["tags"].map { |t| Facecom::Tag.new(width, height, t) }
+    end
+    tags.flatten!
   end
 
   def self.config_file
